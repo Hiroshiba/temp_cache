@@ -1,16 +1,17 @@
 import filecmp
-from os import rename, PathLike
+from os import PathLike, replace
 from pathlib import Path
-from tempfile import NamedTemporaryFile
-
+from tempfile import NamedTemporaryFile, gettempdir
 from typing import Union
 
 
 class TempCache(PathLike):
-    r"""
-
-    """
-    def __init__(self, src_path: Union[str, Path], dst_path: Path = None, cache_dir: Path = Path('/tmp/')):
+    def __init__(
+        self,
+        src_path: Union[str, Path],
+        dst_path: Path = None,
+        cache_dir: Path = Path(gettempdir()),
+    ):
         src_path = Path(src_path)
         if dst_path is None:
             dst_path = cache_dir.joinpath(*src_path.absolute().parts[1:])
@@ -28,7 +29,7 @@ class TempCache(PathLike):
         with NamedTemporaryFile(dir=str(self.dst_path.parent), delete=False) as f:
             f.write(self.src_path.read_bytes())
 
-        rename(f.name, str(self.dst_path))
+        replace(f.name, str(self.dst_path))
 
     def __str__(self):
         self.create_cache()

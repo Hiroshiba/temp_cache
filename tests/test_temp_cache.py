@@ -1,4 +1,5 @@
 from pathlib import Path
+from tempfile import gettempdir
 
 import pytest
 
@@ -19,7 +20,7 @@ def _remove_cache(cache: TempCache):
 def test_temp_cache_will_create_at_tmp_dir(src_path: Path):
     cache = TempCache(src_path)
     cache.create_cache()
-    assert str(cache.dst_path) == str(Path('/tmp/') / '/'.join(src_path.parts[1:]))
+    assert str(cache.dst_path) == str(Path(gettempdir(), *src_path.parts[1:]))
 
 
 def test_create_cache(src_path: Path):
@@ -67,7 +68,7 @@ def test_recreate_cache_when_file_is_different(src_path: Path):
     cache.create_cache()
     text = cache.dst_path.read_text()
 
-    cache.dst_path.write_text('other text')
+    cache.dst_path.write_text("other text")
     assert cache.dst_path.read_text() != text
 
     cache.create_cache()
